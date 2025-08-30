@@ -1,4 +1,4 @@
-# Create your views here.We are using function based views since they are straight forward and easy to understand
+# Create your views here.We are using function based views since they are straight forward and easy to understand and mapping them to specific templates
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login
 from django.shortcuts import render, redirect, get_object_or_404
