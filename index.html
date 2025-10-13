@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b1220" />
+  <title>NeuroSleep — Precision Sleep Tracking</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="assets/icon-192.png">
+  <meta name="description" content="NeuroSleep: a premium, privacy-first sleep tracker with clinical-grade visuals." />
+  <style>
+    :root{
+      --bg:#0b1020;
+      --card:#11162a;
+      --card-2:#0e1430;
+      --accent:#6fe3ff;
+      --accent-2:#7b7bff;
+      --accent-3:#6cffba;
+      --text:#e8eefb;
+      --muted:#a9b3d1;
+      --warning:#ffb86b;
+      --good:#6cffba;
+      --bad:#ff6b8a;
+      --shadow: 0 10px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.05);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Noto Sans,sans-serif;
+      color:var(--text); background: radial-gradient(1200px 800px at 80% -20%, #1b2450 0%, var(--bg) 45%) no-repeat, var(--bg);
+      letter-spacing:.2px;
+    }
+    .container{max-width:1200px; margin:0 auto; padding:24px}
+    header{
+      display:flex; align-items:center; justify-content:space-between; gap:16px; margin-bottom:18px;
+    }
+    .brand{display:flex; align-items:center; gap:12px}
+    .brand svg{width:36px; height:36px; filter: drop-shadow(0 10px 20px rgba(111,227,255,.25));}
+    .brand h1{font-size:20px; margin:0; font-weight:700; letter-spacing:.4px}
+    .nav{
+      display:flex; gap:8px; flex-wrap:wrap;
+      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+      padding:6px; border-radius:999px; box-shadow:var(--shadow)
+    }
+    .nav button{
+      background:transparent; border:none; color:var(--muted); padding:10px 14px; border-radius:999px; cursor:pointer; font-weight:600
+    }
+    .nav button.active{background:linear-gradient(90deg, rgba(111,227,255,.18), rgba(123,123,255,.18)); color:var(--text)}
+    .grid{display:grid; gap:16px}
+    @media(min-width:900px){
+      .grid{grid-template-columns: 1.2fr .8fr}
+    }
+    .card{
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding:16px;
+    }
+    .card h2{margin:0 0 12px 0; font-size:16px; color:var(--muted); letter-spacing:.3px}
+    .row{display:flex; gap:12px; flex-wrap:wrap}
+    .metric{
+      flex:1 1 140px; min-width:140px; background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02)); border-radius:16px;
+      padding:14px; box-shadow:var(--shadow)
+    }
+    .metric .label{font-size:12px; color:var(--muted)}
+    .metric .value{font-size:22px; font-weight:800; margin-top:6px}
+    .tag{font-size:11px; padding:4px 8px; border-radius:999px; background:rgba(255,255,255,.06); color:var(--muted); display:inline-block}
+    .hero{
+      display:grid; grid-template-columns: 220px 1fr; gap:16px;
+    }
+    @media(max-width:800px){
+      .hero{grid-template-columns:1fr}
+    }
+    .ring{
+      width:220px; height:220px; position:relative; display:grid; place-items:center; margin:auto;
+    }
+    .ring svg{position:absolute; inset:0}
+    .ring .score{font-size:42px; font-weight:900; letter-spacing:1px}
+    .ring .caption{color:var(--muted); font-size:12px; margin-top:8px}
+    .hypno, .bars, .linechart{width:100%; height:220px}
+    .subtitle{color:var(--muted); font-size:12px; margin-top:2px}
+    .footer{
+      display:flex; justify-content:space-between; align-items:center; margin-top:8px; color:var(--muted); font-size:12px
+    }
+    .pill{
+      border:none; padding:10px 14px; border-radius:12px; background:linear-gradient(90deg, rgba(111,227,255,.18), rgba(108,255,186,.18));
+      color:var(--text); font-weight:700; cursor:pointer; box-shadow:var(--shadow)
+    }
+    .section{display:none}
+    .section.active{display:block; animation:fade .3s ease}
+    @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
+    .coach-tip{display:flex; gap:12px; align-items:flex-start}
+    .coach-tip .dot{width:10px; height:10px; border-radius:50%; background:var(--accent)}
+    .list{display:grid; gap:10px}
+    .list .item{display:flex; justify-content:space-between; padding:10px 12px; background:rgba(255,255,255,.03); border-radius:12px}
+    .switch{appearance:none; width:42px; height:24px; background:#2a335a; border-radius:999px; position:relative; outline:none; cursor:pointer}
+    .switch:checked{background:#1f8cff}
+    .switch::after{content:''; position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition: all .18s ease}
+    .switch:checked::after{left:21px}
+    a.cta{color:var(--text); text-decoration:none}
+    .logo-word{letter-spacing:.6px; background: linear-gradient(90deg, #b9f5ff, #a6a6ff, #a9ffd7); -webkit-background-clip:text; background-clip:text; color:transparent}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <svg viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="NeuroSleep">
+          <defs>
+            <linearGradient id="g1" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#6fe3ff"/>
+              <stop offset="1" stop-color="#6cffba"/>
+            </linearGradient>
+            <linearGradient id="g2" x1="0" x2="1" y1="0" y2="1">
+              <stop offset="0" stop-color="#7b7bff"/>
+              <stop offset="1" stop-color="#6fe3ff"/>
+            </linearGradient>
+          </defs>
+          <circle cx="64" cy="64" r="58" stroke="url(#g2)" stroke-width="4" opacity=".4"/>
+          <path d="M26 70c12 6 22-2 32-18s24-26 44-14c-6 24-20 40-34 50s-28 10-42 0c-2-6-2-12 0-18z" fill="url(#g1)" opacity=".9"/>
+          <circle cx="96" cy="40" r="6" fill="url(#g2)"/>
+        </svg>
+        <h1><span class="logo-word">NeuroSleep</span></h1>
+      </div>
+      <nav class="nav" role="tablist" aria-label="Primary">
+        <button class="active" data-tab="dashboard">Dashboard</button>
+        <button data-tab="journal">Journal</button>
+        <button data-tab="coach">Coach</button>
+        <button data-tab="trends">Trends</button>
+        <button data-tab="settings">Settings</button>
+      </nav>
+    </header>
+
+    <!-- DASHBOARD -->
+    <section id="dashboard" class="section active">
+      <div class="grid">
+        <div class="card">
+          <div class="hero">
+            <div class="ring">
+              <svg viewBox="0 0 220 220">
+                <circle cx="110" cy="110" r="96" stroke="rgba(255,255,255,.06)" stroke-width="18" fill="none" />
+                <circle id="scoreRing" cx="110" cy="110" r="96" stroke="url(#gradScore)" stroke-width="18" fill="none"
+                        stroke-linecap="round" transform="rotate(-90 110 110)" stroke-dasharray="603.19 603.19" stroke-dashoffset="603.19"/>
+                <defs>
+                  <linearGradient id="gradScore">
+                    <stop offset="0%" stop-color="#6fe3ff"></stop>
+                    <stop offset="100%" stop-color="#6cffba"></stop>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div style="text-align:center">
+                <div class="score" id="scoreValue">—</div>
+                <div class="caption">Sleep Score</div>
+              </div>
+            </div>
+            <div>
+              <h2>Last Night</h2>
+              <div class="row" id="metricsRow"></div>
+              <div class="card" style="margin-top:12px">
+                <h2>Hypnogram</h2>
+                <div class="hypno" id="hypno"></div>
+                <div class="footer">
+                  <div>Stages: <span class="tag">Wake</span> <span class="tag">REM</span> <span class="tag">Light</span> <span class="tag">Deep</span></div>
+                  <div id="sleepWindow" class="subtitle"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Week Overview</h2>
+          <div class="bars" id="bars"></div>
+          <div class="footer">
+            <span class="subtitle" id="weekRange"></span>
+            <a class="cta" href="#" id="exportBtn">Export CSV</a>
+          </div>
+          <div class="row" style="margin-top:8px">
+            <button class="pill" id="smartAlarms">Enable Smart Alarms</button>
+            <button class="pill" id="breathwork">Start Breathwork (4–7–8)</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNAL -->
+    <section id="journal" class="section">
+      <div class="card">
+        <h2>Sleep Journal</h2>
+        <div class="list" id="journalList"></div>
+        <div style="margin-top:12px; display:flex; gap:8px">
+          <input id="journalInput" placeholder="How did you sleep? Any caffeine, stress, exercise…" style="flex:1; padding:12px; border-radius:12px; border:none; background:#111731; color:var(--text)"/>
+          <button class="pill" id="addEntry">Add Entry</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COACH -->
+    <section id="coach" class="section">
+      <div class="card">
+        <h2>Coach</h2>
+        <div class="list" id="coachList"></div>
+      </div>
+    </section>
+
+    <!-- TRENDS -->
+    <section id="trends" class="section">
+      <div class="card">
+        <h2>Trends</h2>
+        <div class="linechart" id="linechart"></div>
+        <div class="subtitle">14‑day moving averages and variability bands.</div>
+      </div>
+    </section>
+
+    <!-- SETTINGS -->
+    <section id="settings" class="section">
+      <div class="card">
+        <h2>Settings</h2>
+        <div class="list">
+          <div class="item"><span>Dark Mode</span><input type="checkbox" class="switch" checked disabled></div>
+          <div class="item"><span>Smart Alarm (30‑min window)</span><input id="toggleAlarm" type="checkbox" class="switch"></div>
+          <div class="item"><span>Auto‑detect Naps</span><input id="toggleNaps" type="checkbox" class="switch" checked></div>
+          <div class="item"><span>Privacy: Local‑only data</span><input id="togglePrivacy" type="checkbox" class="switch" checked></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+  // ---------- Data generation (mock) ----------
+  const DAYS = 14;
+  const now = new Date();
+  function rand(n, m){return Math.random()*(m-n)+n}
+  function clamp(v, n, m){return Math.max(n, Math.min(m, v))}
+
+  // Sleep stage encoding: 0 Wake, 1 REM, 2 Light, 3 Deep
+  function synthesizeStages(totalMinutes){
+    const stages = [];
+    let t = 0;
+    while(t < totalMinutes){
+      const block = Math.floor(rand(10, 30)); // 10–30 min per stage block
+      const stageRand = Math.random();
+      let s = 2; // default Light
+      if(stageRand < .12) s = 0;
+      else if(stageRand < .35) s = 1;
+      else if(stageRand < .85) s = 2;
+      else s = 3;
+      for(let i=0;i<block && t<totalMinutes;i++){ stages.push(s); t++; }
+    }
+    return stages;
+  }
+
+  function generateNight(offset){
+    const date = new Date(now); date.setDate(now.getDate()-offset);
+    const bedtime = new Date(date); bedtime.setHours(23 + Math.floor(rand(-1,1)), Math.floor(rand(0,59)), 0, 0);
+    const durationMin = Math.floor(rand(360, 500)); // 6–8.3h
+    const latency = Math.floor(rand(5, 28));
+    const efficiency = Math.floor(rand(80, 96));
+    const wakeTime = new Date(bedtime.getTime() + durationMin*60000);
+    const stages = synthesizeStages(durationMin);
+    const rem = Math.floor(stages.filter(s=>s===1).length/60);
+    const deep = Math.floor(stages.filter(s=>s===3).length/60);
+    const hrv = Math.floor(rand(48, 78));
+    const rhr = Math.floor(rand(48, 64));
+    const score = clamp(Math.round( (efficiency*.5) + (rem*1.2) + (deep*1.4) - (latency*.8) + rand(-6,6) ), 55, 99);
+
+    return { date, bedtime, wakeTime, durationMin, latency, efficiency, stages, rem, deep, hrv, rhr, score };
+  }
+
+  const nights = Array.from({length:DAYS}, (_,i)=>generateNight(i));
+  const last = nights[0];
+
+  // ---------- Utilities ----------
+  function fmtHM(mins){
+    const h = Math.floor(mins/60), m = Math.floor(mins%60);
+    return `${h}h ${m.toString().padStart(2,'0')}m`;
+  }
+  function fmtTime(d){
+    const h = d.getHours(), m = d.getMinutes().toString().padStart(2,'0');
+    const ampm = h>=12?'PM':'AM'; const hh = ((h+11)%12+1);
+    return `${hh}:${m} ${ampm}`;
+  }
+  function dateLabel(d){
+    return d.toLocaleDateString(undefined,{month:"short", day:"numeric"});
+  }
+
+  // ---------- Score ring ----------
+  const circumference = 2 * Math.PI * 96;
+  const scoreRing = document.getElementById('scoreRing');
+  const scoreValue = document.getElementById('scoreValue');
+  function setScore(v){
+    const offset = circumference * (1 - v/100);
+    scoreRing.style.strokeDashoffset = offset;
+    scoreValue.textContent = v;
+  }
+  setTimeout(()=>setScore(last.score), 250);
+
+  // ---------- Metrics ----------
+  const metrics = [
+    {label:'Duration', value: fmtHM(last.durationMin)},
+    {label:'Efficiency', value: last.efficiency + '%'},
+    {label:'Latency', value: last.latency + ' min'},
+    {label:'REM', value: last.rem + ' h'},
+    {label:'Deep', value: last.deep + ' h'},
+    {label:'HRV (rMSSD)', value: last.hrv + ' ms'},
+    {label:'Resting HR', value: last.rhr + ' bpm'},
+  ];
+  const metricsRow = document.getElementById('metricsRow');
+  metrics.forEach(m=>{
+    const el = document.createElement('div'); el.className='metric';
+    el.innerHTML = `<div class="label">${m.label}</div><div class="value">${m.value}</div>`;
+    metricsRow.appendChild(el);
+  });
+  document.getElementById('sleepWindow').textContent = `${fmtTime(last.bedtime)} – ${fmtTime(last.wakeTime)}`;
+
+  // ---------- Hypnogram (SVG) ----------
+  const hypno = document.getElementById('hypno');
+  (function drawHypnogram(){
+    const w = hypno.clientWidth || hypno.offsetWidth || 600; const h = 220;
+    const pad = 18; const innerW = w - pad*2; const innerH = h - pad*2;
+    const levels = [0,1,2,3]; // 0 Wake (top) → 3 Deep (bottom)
+    const yFor = s => pad + (levels.indexOf(s) / (levels.length-1)) * innerH;
+    const xFor = (i,max) => pad + (i/max) * innerW;
+
+    const max = last.stages.length-1;
+    let d = `M ${xFor(0,max)} ${yFor(last.stages[0])}`;
+    for(let i=1;i<=max;i++){
+      d += ` L ${xFor(i,max)} ${yFor(last.stages[i])}`;
+    }
+    const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="lineG"><stop offset="0%" stop-color="#6fe3ff"/><stop offset="100%" stop-color="#6cffba"/></linearGradient>
+      </defs>
+      <rect x="0" y="${h-32}" width="${w}" height="32" fill="rgba(255,255,255,.05)"/>
+      <path d="${d}" fill="none" stroke="url(#lineG)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+    </svg>`;
+    hypno.innerHTML = svg;
+  })();
+
+  // ---------- Weekly Bars ----------
+  const bars = document.getElementById('bars');
+  (function drawBars(){
+    const w = bars.clientWidth || 600; const h = 220;
+    const pad = 18; const innerW = w - pad*2; const innerH = h - pad*2;
+    const days = nights.slice(0,7).reverse();
+    const maxMins = Math.max(...days.map(n=>n.durationMin));
+    const bw = innerW / days.length * .6;
+    let rects = '';
+    days.forEach((n,i)=>{
+      const x = pad + i*(innerW/days.length) + (innerW/days.length-bw)/2;
+      const bh = (n.durationMin / maxMins) * innerH;
+      const y = h - pad - bh;
+      rects += `<g>
+        <rect x="${x}" y="${y}" width="${bw}" height="${bh}" rx="8" fill="url(#barG)"></rect>
+        <text x="${x + bw/2}" y="${h-6}" font-size="11" text-anchor="middle" fill="#a9b3d1">${'SMTWTFS'[n.date.getDay()]}</text>
+      </g>`;
+    });
+    const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs><linearGradient id="barG"><stop offset="0%" stop-color="#7b7bff"/><stop offset="100%" stop-color="#6fe3ff"/></linearGradient></defs>
+      ${rects}
+    </svg>`;
+    bars.innerHTML = svg;
+  })();
+  const weekRange = document.getElementById('weekRange');
+  const end = nights[0].date, start = nights[6].date;
+  weekRange.textContent = `${start.toLocaleDateString(undefined,{month:"short", day:"numeric"})} – ${end.toLocaleDateString(undefined,{month:"short", day:"numeric"})}`;
+
+  // ---------- Journal ----------
+  const journalList = document.getElementById('journalList');
+  const journal = JSON.parse(localStorage.getItem('neuro_journal')||'[]');
+  function renderJournal(){
+    journalList.innerHTML = '';
+    journal.forEach((e,i)=>{
+      const el = document.createElement('div'); el.className = 'item';
+      el.innerHTML = `<span>${e.text}</span><span class="subtitle">${new Date(e.ts).toLocaleString()}</span>`;
+      journalList.appendChild(el);
+    });
+  }
+  renderJournal();
+  document.getElementById('addEntry').onclick = ()=>{
+    const input = document.getElementById('journalInput');
+    if(!input.value.trim()) return;
+    journal.unshift({text: input.value.trim(), ts: Date.now()});
+    localStorage.setItem('neuro_journal', JSON.stringify(journal));
+    input.value = ''; renderJournal();
+  };
+
+  // ---------- Coach (rules-of-thumb) ----------
+  const coachList = document.getElementById('coachList');
+  const tips = [
+    "Aim for a consistent sleep window — drift less than ±30 minutes.",
+    "Keep your room cool (16–19°C), dark, and quiet.",
+    "Avoid caffeine after 2 PM; alcohol may fragment REM sleep.",
+    "Morning light anchors circadian rhythm; step outside within 60 minutes of waking.",
+    "Reserve the bed for sleep and intimacy only — if awake >20 minutes, get up and reset.",
+    "Wind‑down ritual: 30–60 minutes of low‑arousal activities before bed.",
+    "Try the 4–7–8 breathing pattern when anxious at bedtime.",
+    "Strength + aerobic exercise improve deep sleep; finish ≥3 hours before bed."
+  ];
+  function renderCoach(){
+    coachList.innerHTML='';
+    tips.forEach(t=>{
+      const el = document.createElement('div'); el.className='coach-tip';
+      el.innerHTML = `<div class="dot"></div><div>${t}</div>`;
+      coachList.appendChild(el);
+    });
+  }
+  renderCoach();
+
+  // ---------- Trends (line chart: score over time) ----------
+  const linechart = document.getElementById('linechart');
+  (function drawLine(){
+    const w = linechart.clientWidth || 600; const h = 220;
+    const pad = 22; const innerW = w - pad*2; const innerH = h - pad*2;
+    const scores = nights.slice().reverse().map(n=>n.score);
+    const min = Math.min(...scores)-4, max = Math.max(...scores)+4;
+    const xFor = (i,maxI) => pad + (i/maxI) * innerW;
+    const yFor = v => pad + (1 - (v-min)/(max-min)) * innerH;
+    let d = `M ${xFor(0,scores.length-1)} ${yFor(scores[0])}`;
+    for(let i=1;i<scores.length;i++){ d += ` L ${xFor(i,scores.length-1)} ${yFor(scores[i])}`;}
+    const points = scores.map((v,i)=>`<circle cx="${xFor(i,scores.length-1)}" cy="${yFor(v)}" r="2.8" fill="url(#lg)" opacity=".9"></circle>`).join('');
+    const labels = nights.slice().reverse().map((n,i)=>`<text x="${xFor(i,scores.length-1)}" y="${h-6}" font-size="10" text-anchor="middle" fill="#a9b3d1">${dateLabel(n.date)}</text>`).join('');
+    const svg = `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none">
+      <defs><linearGradient id="lg"><stop offset="0%" stop-color="#6fe3ff"/><stop offset="100%" stop-color="#6cffba"/></linearGradient></defs>
+      <path d="${d}" fill="none" stroke="url(#lg)" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"></path>
+      ${points}
+      ${labels}
+    </svg>`;
+    linechart.innerHTML = svg;
+  })();
+
+  // ---------- Export CSV ----------
+  document.getElementById('exportBtn').onclick = (e)=>{
+    e.preventDefault();
+    const rows = [['Date','Bedtime','Wake','Duration(min)','Latency(min)','Efficiency(%)','REM(h)','Deep(h)','HRV(ms)','RestingHR(bpm)','Score']];
+    nights.slice().reverse().forEach(n=>{
+      rows.push([
+        n.date.toISOString().slice(0,10),
+        fmtTime(n.bedtime),
+        fmtTime(n.wakeTime),
+        n.durationMin, n.latency, n.efficiency, n.rem, n.deep, n.hrv, n.rhr, n.score
+      ]);
+    });
+    const csv = rows.map(r=>r.join(',')).join('\n');
+    const blob = new Blob([csv], {type:'text/csv'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'neurosleep_export.csv'; a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  // ---------- Nav ----------
+  document.querySelectorAll('.nav button').forEach(btn=>{
+    btn.onclick = ()=>{
+      document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    };
+  });
+
+  // ---------- Settings ----------
+  document.getElementById('toggleAlarm').onchange = (e)=>{
+    if(e.target.checked) alert('Smart Alarms enabled. We will nudge your wake‑up during a light stage.');
+  };
+  document.getElementById('breathwork').onclick = ()=>{
+    alert('Inhale 4s — hold 7s — exhale 8s. Repeat x4. Breathe slowly and softly.');
+  };
+  </script>
+</body>
+</html>
