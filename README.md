@@ -21,5 +21,8 @@ This is a **downloadable, offline-friendly app** of *NeuroSleep*, a premium, pri
 - Adjust data generation in `index.html` (the `<script>` section).
 - Replace `assets/icon-*.png` to rebrand.
 
+## Website
+https://phionanamugga.github.io/neurosleep/ 
+
 ---
 **Made for you by a sleep-tech obsessed SME — 20+ years at the intersection of clinical sleep science and consumer tech.**
